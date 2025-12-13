@@ -5,6 +5,7 @@ import * as fs from "fs";
 interface BranchNote {
   branchName: string;
   content: string;
+  author: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -45,7 +46,7 @@ export class NoteStorageService {
   /**
    * Save a note for a specific branch
    */
-  async saveNote(branchName: string, content: string): Promise<void> {
+  async saveNote(branchName: string, content: string, author: string): Promise<void> {
     const filePath = this.getNoteFilePath(branchName);
     const now = new Date().toISOString();
 
@@ -56,6 +57,7 @@ export class NoteStorageService {
       note = {
         ...existing!,
         content,
+        author,
         updatedAt: now,
       };
     } else {
@@ -63,6 +65,7 @@ export class NoteStorageService {
       note = {
         branchName,
         content,
+        author,
         createdAt: now,
         updatedAt: now,
       };

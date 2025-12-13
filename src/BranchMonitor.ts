@@ -101,11 +101,15 @@ export class BranchMonitor {
     branchName: string,
     content: string
   ): Promise<void> {
+    // Get the full note to access author
+    const note = await this.storageService.getNote(branchName);
+    const author = note?.author || "Unknown";
+
     // Strip HTML tags for the popup message (simple version)
     const plainText = content.replace(/<[^>]*>/g, "");
 
     const action = await vscode.window.showInformationMessage(
-      `📝 Branch Note (${branchName}): ${plainText}`,
+      `📝 Branch Note from ${author} (${branchName}): ${plainText}`,
       "Dismiss",
       "View Full Note"
     );
@@ -115,7 +119,7 @@ export class BranchMonitor {
       this.markNoteDismissed(branchName);
     } else if (action === "View Full Note") {
       // Show full note in a webview
-      this.showFullNote(branchName, content);
+      this.showFullNote(branchName, content, author);
       // Also mark as dismissed so it doesn't show again
       this.markNoteDismissed(branchName);
     }
@@ -124,7 +128,7 @@ export class BranchMonitor {
   /**
    * Show full note in a webview panel
    */
-  private showFullNote(branchName: string, content: string): void {
+  private showFullNote(branchName: string, content: string, author: string): void {
     const panel = vscode.window.createWebviewPanel(
       "branchNoteView",
       `Branch Note: ${branchName}`,
@@ -151,6 +155,11 @@ export class BranchMonitor {
             border-bottom: 1px solid var(--vscode-panel-border);
             padding-bottom: 10px;
           }
+          .author-info {
+            color: var(--vscode-descriptionForeground);
+            font-size: 14px;
+            margin-bottom: 20px;
+          }
           .note-content {
             margin-top: 20px;
             line-height: 1.6;
@@ -159,6 +168,7 @@ export class BranchMonitor {
       </head>
       <body>
         <h1>📝 Branch Note: ${branchName}</h1>
+        <div class="author-info">👤 Author: <strong>${author}</strong></div>
         <div class="note-content">
           ${content}
         </div>

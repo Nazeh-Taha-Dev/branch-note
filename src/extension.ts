@@ -2,9 +2,11 @@ import * as vscode from "vscode";
 import { BranchNotesView } from "./BranchNotesView";
 import { NoteStorageService } from "./NoteStorageService";
 import { BranchMonitor } from "./BranchMonitor";
+import { GitUserService } from "./GitUserService";
 
 let storageService: NoteStorageService | null = null;
 let branchMonitor: BranchMonitor | null = null;
+let gitUserService: GitUserService | null = null;
 
 export function activate(context: vscode.ExtensionContext) {
   // Get workspace root folder
@@ -18,6 +20,9 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Initialize storage service
   storageService = new NoteStorageService(workspaceFolder.uri.fsPath);
+
+  // Initialize Git user service
+  gitUserService = new GitUserService();
 
   // Initialize branch monitor
   branchMonitor = new BranchMonitor(storageService, context);
@@ -41,8 +46,8 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {}
 
 // Function to open rich text editor
-function openNoteEditor(context: vscode.ExtensionContext) {
-  if (!branchMonitor || !storageService) {
+async function openNoteEditor(context: vscode.ExtensionContext) {
+  if (!branchMonitor || !storageService || !gitUserService) {
     vscode.window.showErrorMessage(
       "Branch Notes: Service not initialized properly."
     );
@@ -57,14 +62,17 @@ function openNoteEditor(context: vscode.ExtensionContext) {
     return;
   }
 
+  // Get author name
+  const author = await gitUserService.getUsername();
+
   const panel = vscode.window.createWebviewPanel(
-    "branchNoteEditor", // internal identifier
-    `Create Branch Note: ${currentBranch}`, // title shown in tab
+    "branchNoteEditor",
+    `Create Branch Note: ${currentBranch}`,
     vscode.ViewColumn.One,
-    { enableScripts: true } // allow JS
+    { enableScripts: true }
   );
 
-  // HTML content for the rich-text editor
+  // HTML content for the rich-text editor with formatting toolbar
   panel.webview.html = `
     <!DOCTYPE html>
     <html lang="en">
@@ -72,32 +80,151 @@ function openNoteEditor(context: vscode.ExtensionContext) {
       <meta charset="UTF-8">
       <title>Create Branch Note</title>
       <style>
-        body { font-family: sans-serif; padding: 10px; }
-        #editor { width: 100%; height: 300px; border: 1px solid #ccc; padding: 5px; }
-        button { margin-top: 10px; padding: 5px 10px; }
+        body { 
+          font-family: var(--vscode-font-family);
+          padding: 20px;
+          color: var(--vscode-foreground);
+          background-color: var(--vscode-editor-background);
+        }
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid var(--vscode-panel-border);
+        }
         .branch-info { 
-          background: #f0f0f0; 
-          padding: 10px; 
-          margin-bottom: 10px; 
+          font-size: 14px;
+          color: var(--vscode-descriptionForeground);
+        }
+        .author-info {
+          font-size: 13px;
+          color: var(--vscode-descriptionForeground);
+        }
+        h2 {
+          margin: 0 0 15px 0;
+          color: var(--vscode-foreground);
+        }
+        .toolbar {
+          margin-bottom: 10px;
+          padding: 8px;
+          background: var(--vscode-editor-background);
+          border: 1px solid var(--vscode-panel-border);
           border-radius: 4px;
+          display: flex;
+          gap: 8px;
+        }
+        .toolbar button {
+          padding: 6px 12px;
+          background: var(--vscode-button-background);
+          color: var(--vscode-button-foreground);
+          border: none;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 13px;
+          font-weight: 500;
+        }
+        .toolbar button:hover {
+          background: var(--vscode-button-hoverBackground);
+        }
+        #editor { 
+          width: 100%; 
+          min-height: 300px; 
+          border: 1px solid var(--vscode-input-border);
+          padding: 10px;
+          background: var(--vscode-input-background);
+          color: var(--vscode-input-foreground);
+          border-radius: 4px;
+          outline: none;
+        }
+        #editor:focus {
+          border-color: var(--vscode-focusBorder);
+        }
+        .actions {
+          margin-top: 15px;
+          display: flex;
+          gap: 10px;
+        }
+        .save-btn {
+          padding: 8px 16px;
+          background: var(--vscode-button-background);
+          color: var(--vscode-button-foreground);
+          border: none;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: 14px;
+        }
+        .save-btn:hover {
+          background: var(--vscode-button-hoverBackground);
         }
       </style>
     </head>
     <body>
-      <div class="branch-info">
-        <strong>Branch:</strong> ${currentBranch}
+      <div class="header">
+        <div>
+          <h2>Create Branch Note</h2>
+          <div class="branch-info">📝 Branch: <strong>${currentBranch}</strong></div>
+        </div>
+        <div class="author-info">
+          👤 Author: <strong>${author}</strong>
+        </div>
       </div>
-      <h2>Create Branch Note</h2>
-      <div id="editor" contenteditable="true" placeholder="Write your note here..."></div>
-      <br/>
-      <button id="sendBtn">Save Note</button>
+
+      <div class="toolbar">
+        <button onclick="formatText('bold')" title="Bold (Ctrl+B)">
+          <strong>B</strong>
+        </button>
+        <button onclick="insertList('ul')" title="Bullet List">
+          • List
+        </button>
+        <button onclick="insertList('ol')" title="Numbered List">
+          1. List
+        </button>
+      </div>
+
+      <div id="editor" contenteditable="true"></div>
+
+      <div class="actions">
+        <button class="save-btn" id="saveBtn">💾 Save Note</button>
+      </div>
 
       <script>
         const vscodeApi = acquireVsCodeApi();
-        document.getElementById('sendBtn').addEventListener('click', () => {
-          const noteContent = document.getElementById('editor').innerHTML;
-          vscodeApi.postMessage({ type: 'submit', content: noteContent });
+        const editor = document.getElementById('editor');
+
+        // Format selected text
+        function formatText(command) {
+          document.execCommand(command, false, null);
+          editor.focus();
+        }
+
+        // Insert list
+        function insertList(type) {
+          document.execCommand(type === 'ul' ? 'insertUnorderedList' : 'insertOrderedList', false, null);
+          editor.focus();
+        }
+
+        // Keyboard shortcuts
+        editor.addEventListener('keydown', (e) => {
+          if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+            e.preventDefault();
+            formatText('bold');
+          }
         });
+
+        // Save note
+        document.getElementById('saveBtn').addEventListener('click', () => {
+          const noteContent = editor.innerHTML;
+          vscodeApi.postMessage({ 
+            type: 'submit', 
+            content: noteContent,
+            author: '${author}'
+          });
+        });
+
+        // Focus editor on load
+        editor.focus();
       </script>
     </body>
     </html>
@@ -107,11 +234,11 @@ function openNoteEditor(context: vscode.ExtensionContext) {
   panel.webview.onDidReceiveMessage(async (msg) => {
     if (msg.type === "submit") {
       try {
-        await storageService!.saveNote(currentBranch, msg.content);
+        await storageService!.saveNote(currentBranch, msg.content, msg.author);
         vscode.window.showInformationMessage(
           `Note saved for branch: ${currentBranch}`
         );
-        panel.dispose(); // close the editor after submit
+        panel.dispose();
       } catch (error) {
         vscode.window.showErrorMessage(
           `Failed to save note: ${error}`

@@ -35,8 +35,8 @@ export class BranchNotesView
         note.branchName,
         vscode.TreeItemCollapsibleState.None
       );
-      item.tooltip = `Last updated: ${new Date(note.updatedAt).toLocaleString()}`;
-      item.description = new Date(note.updatedAt).toLocaleDateString();
+      item.tooltip = `Author: ${note.author || "Unknown"}\nLast updated: ${new Date(note.updatedAt).toLocaleString()}`;
+      item.description = `by ${note.author || "Unknown"}`;
       item.iconPath = new vscode.ThemeIcon("note");
       item.contextValue = "branchNote";
       return item;
