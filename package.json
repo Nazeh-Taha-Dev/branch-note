@@ -1,7 +1,7 @@
 {
   "name": "branch-note",
   "displayName": "Branch Note",
-  "description": "Shows notifications for branch-specific notes using DB..",
+  "description": "Shows notifications for branch-specific notes.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.100.0"
