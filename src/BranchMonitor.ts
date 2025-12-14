@@ -70,8 +70,9 @@ export class BranchMonitor {
    * Check if a note exists for the branch and show it if not dismissed
    */
   private async checkAndShowNote(branchName: string): Promise<void> {
-    // Check if note exists
-    if (!this.storageService.hasNote(branchName)) {
+    // Get the latest note content
+    const note = await this.storageService.getLatestNote(branchName);
+    if (!note) {
       return;
     }
 
@@ -84,27 +85,21 @@ export class BranchMonitor {
       return;
     }
 
-    // Get the note content
-    const note = await this.storageService.getNote(branchName);
-    if (!note) {
-      return;
-    }
-
     // Show the note in a popup
-    this.showNotePopup(branchName, note.content);
+    this.showNotePopup(branchName, note.content, note.author);
   }
 
   /**
    * Show note popup to user
    */
+  /**
+   * Show note popup to user
+   */
   private async showNotePopup(
     branchName: string,
-    content: string
+    content: string,
+    author: string
   ): Promise<void> {
-    // Get the full note to access author
-    const note = await this.storageService.getNote(branchName);
-    const author = note?.author || "Unknown";
-
     // Strip HTML tags for the popup message (simple version)
     const plainText = content.replace(/<[^>]*>/g, "");
 
@@ -118,8 +113,8 @@ export class BranchMonitor {
       // Mark note as dismissed
       this.markNoteDismissed(branchName);
     } else if (action === "View Full Note") {
-      // Show full note in a webview
-      this.showFullNote(branchName, content, author);
+      // Show full note using the command
+      vscode.commands.executeCommand("branchNotes.viewNote", branchName);
       // Also mark as dismissed so it doesn't show again
       this.markNoteDismissed(branchName);
     }
@@ -128,54 +123,7 @@ export class BranchMonitor {
   /**
    * Show full note in a webview panel
    */
-  private showFullNote(branchName: string, content: string, author: string): void {
-    const panel = vscode.window.createWebviewPanel(
-      "branchNoteView",
-      `Branch Note: ${branchName}`,
-      vscode.ViewColumn.One,
-      { enableScripts: false }
-    );
 
-    panel.webview.html = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Branch Note</title>
-        <style>
-          body {
-            font-family: var(--vscode-font-family);
-            padding: 20px;
-            color: var(--vscode-foreground);
-            background-color: var(--vscode-editor-background);
-          }
-          h1 {
-            color: var(--vscode-foreground);
-            border-bottom: 1px solid var(--vscode-panel-border);
-            padding-bottom: 10px;
-          }
-          .author-info {
-            color: var(--vscode-descriptionForeground);
-            font-size: 14px;
-            margin-bottom: 20px;
-          }
-          .note-content {
-            margin-top: 20px;
-            line-height: 1.6;
-          }
-        </style>
-      </head>
-      <body>
-        <h1>📝 Branch Note: ${branchName}</h1>
-        <div class="author-info">👤 Author: <strong>${author}</strong></div>
-        <div class="note-content">
-          ${content}
-        </div>
-      </body>
-      </html>
-    `;
-  }
 
   /**
    * Get unique key for a note (branch name + content hash)

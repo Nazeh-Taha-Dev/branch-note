@@ -1,142 +1,117 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
+import * as crypto from "crypto";
 
-interface BranchNote {
-  branchName: string;
+export interface BranchNote {
+  id: string;
   content: string;
   author: string;
-  createdAt: string;
-  updatedAt: string;
+  timestamp: string;
+}
+
+interface StorageData {
+  [branchName: string]: BranchNote[];
 }
 
 export class NoteStorageService {
-  private notesDir: string;
+  private storageFile: string;
 
   constructor(workspaceRoot: string) {
-    this.notesDir = path.join(workspaceRoot, ".branch-notes");
-    this.ensureNotesDirExists();
+    this.storageFile = path.join(workspaceRoot, ".branch-notes.json");
   }
 
   /**
-   * Ensure the .branch-notes directory exists
+   * Read all data from storage file
    */
-  private ensureNotesDirExists(): void {
-    if (!fs.existsSync(this.notesDir)) {
-      fs.mkdirSync(this.notesDir, { recursive: true });
+  private readData(): StorageData {
+    if (!fs.existsSync(this.storageFile)) {
+      return {};
     }
-  }
-
-  /**
-   * Sanitize branch name to be used as a filename
-   * Replaces invalid characters with underscores
-   */
-  private sanitizeBranchName(branchName: string): string {
-    return branchName.replace(/[^a-zA-Z0-9-_]/g, "_");
-  }
-
-  /**
-   * Get the file path for a given branch
-   */
-  private getNoteFilePath(branchName: string): string {
-    const sanitized = this.sanitizeBranchName(branchName);
-    return path.join(this.notesDir, `${sanitized}.json`);
-  }
-
-  /**
-   * Save a note for a specific branch
-   */
-  async saveNote(branchName: string, content: string, author: string): Promise<void> {
-    const filePath = this.getNoteFilePath(branchName);
-    const now = new Date().toISOString();
-
-    let note: BranchNote;
-    if (fs.existsSync(filePath)) {
-      // Update existing note
-      const existing = await this.getNote(branchName);
-      note = {
-        ...existing!,
-        content,
-        author,
-        updatedAt: now,
-      };
-    } else {
-      // Create new note
-      note = {
-        branchName,
-        content,
-        author,
-        createdAt: now,
-        updatedAt: now,
-      };
-    }
-
-    fs.writeFileSync(filePath, JSON.stringify(note, null, 2), "utf-8");
-  }
-
-  /**
-   * Get a note for a specific branch
-   */
-  async getNote(branchName: string): Promise<BranchNote | null> {
-    const filePath = this.getNoteFilePath(branchName);
-
-    if (!fs.existsSync(filePath)) {
-      return null;
-    }
-
     try {
-      const content = fs.readFileSync(filePath, "utf-8");
-      return JSON.parse(content) as BranchNote;
+      const content = fs.readFileSync(this.storageFile, "utf-8");
+      return JSON.parse(content);
     } catch (error) {
-      console.error(`Error reading note for branch ${branchName}:`, error);
-      return null;
+      console.error("Error reading branch notes file:", error);
+      return {};
     }
   }
 
   /**
-   * Check if a note exists for a specific branch
+   * Write data to storage file
    */
-  hasNote(branchName: string): boolean {
-    const filePath = this.getNoteFilePath(branchName);
-    return fs.existsSync(filePath);
+  private writeData(data: StorageData): void {
+    fs.writeFileSync(this.storageFile, JSON.stringify(data, null, 2), "utf-8");
   }
 
   /**
-   * Get all branch notes
+   * Add a new note to a branch's history
    */
-  async getAllNotes(): Promise<BranchNote[]> {
-    if (!fs.existsSync(this.notesDir)) {
-      return [];
+  async addNote(branchName: string, content: string, author: string): Promise<void> {
+    const data = this.readData();
+    
+    if (!data[branchName]) {
+      data[branchName] = [];
     }
 
-    const files = fs.readdirSync(this.notesDir);
-    const notes: BranchNote[] = [];
+    const newNote: BranchNote = {
+      id: crypto.randomUUID(),
+      content,
+      author,
+      timestamp: new Date().toISOString(),
+    };
 
-    for (const file of files) {
-      if (file.endsWith(".json")) {
-        try {
-          const content = fs.readFileSync(
-            path.join(this.notesDir, file),
-            "utf-8"
-          );
-          notes.push(JSON.parse(content) as BranchNote);
-        } catch (error) {
-          console.error(`Error reading note file ${file}:`, error);
-        }
+    // Add to beginning of array (newest first)
+    data[branchName].unshift(newNote);
+    this.writeData(data);
+  }
+
+  /**
+   * Get all notes for a specific branch
+   */
+  async getNotes(branchName: string): Promise<BranchNote[]> {
+    const data = this.readData();
+    return data[branchName] || [];
+  }
+
+  /**
+   * Get the latest note for a branch
+   */
+  async getLatestNote(branchName: string): Promise<BranchNote | null> {
+    const notes = await this.getNotes(branchName);
+    return notes.length > 0 ? notes[0] : null;
+  }
+
+  /**
+   * Get all branches that have notes
+   */
+  async getBranches(): Promise<string[]> {
+    const data = this.readData();
+    return Object.keys(data);
+  }
+
+  /**
+   * Delete a specific note
+   */
+  async deleteNote(branchName: string, noteId: string): Promise<void> {
+    const data = this.readData();
+    if (data[branchName]) {
+      data[branchName] = data[branchName].filter(n => n.id !== noteId);
+      if (data[branchName].length === 0) {
+        delete data[branchName];
       }
+      this.writeData(data);
     }
-
-    return notes;
   }
 
   /**
-   * Delete a note for a specific branch
+   * Delete all notes for a branch
    */
-  async deleteNote(branchName: string): Promise<void> {
-    const filePath = this.getNoteFilePath(branchName);
-
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+  async deleteBranch(branchName: string): Promise<void> {
+    const data = this.readData();
+    if (data[branchName]) {
+      delete data[branchName];
+      this.writeData(data);
     }
   }
 }

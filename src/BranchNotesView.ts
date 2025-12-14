@@ -1,58 +1,78 @@
 import * as vscode from "vscode";
-import { NoteStorageService } from "./NoteStorageService";
+import { NoteStorageService, BranchNote } from "./NoteStorageService";
 
-export class BranchNotesView
-  implements vscode.TreeDataProvider<vscode.TreeItem>
-{
-  private _onDidChangeTreeData: vscode.EventEmitter<any> =
-    new vscode.EventEmitter<any>();
-  readonly onDidChangeTreeData: vscode.Event<any> =
-    this._onDidChangeTreeData.event;
+// Tree item types
+type BranchTreeItem = BranchItem | NoteItem | CreateNoteItem;
 
-  private storageService: NoteStorageService;
-
-  constructor(storageService: NoteStorageService) {
-    this.storageService = storageService;
+class BranchItem extends vscode.TreeItem {
+  constructor(public readonly branchName: string) {
+    super(branchName, vscode.TreeItemCollapsibleState.Collapsed);
+    this.contextValue = "branchItem";
+    this.iconPath = new vscode.ThemeIcon("git-branch");
   }
+}
 
-  /**
-   * Refresh the tree view
-   */
-  refresh(): void {
-    this._onDidChangeTreeData.fire(undefined);
+class NoteItem extends vscode.TreeItem {
+  constructor(
+    public readonly branchName: string,
+    public readonly note: BranchNote
+  ) {
+    const date = new Date(note.timestamp);
+    const label = date.toLocaleString();
+    super(label, vscode.TreeItemCollapsibleState.None);
+    
+    this.description = `by ${note.author}`;
+    this.tooltip = new vscode.MarkdownString(`**${note.author}** on ${date.toLocaleString()}\n\n---\n\n${note.content}`);
+    this.tooltip.supportHtml = true;
+    this.contextValue = "noteItem";
+    this.iconPath = new vscode.ThemeIcon("note");
+    
+    this.command = {
+      command: "branchNotes.viewNote",
+      title: "View Note",
+      arguments: [branchName, note]
+    };
   }
+}
 
-  getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
-    return element;
-  }
-
-  async getChildren(): Promise<vscode.TreeItem[]> {
-    const notes = await this.storageService.getAllNotes();
-
-    // Create tree items for each note
-    const noteItems = notes.map((note) => {
-      const item = new vscode.TreeItem(
-        note.branchName,
-        vscode.TreeItemCollapsibleState.None
-      );
-      item.tooltip = `Author: ${note.author || "Unknown"}\nLast updated: ${new Date(note.updatedAt).toLocaleString()}`;
-      item.description = `by ${note.author || "Unknown"}`;
-      item.iconPath = new vscode.ThemeIcon("note");
-      item.contextValue = "branchNote";
-      return item;
-    });
-
-    // Add "Create New Note" button at the top
-    const createNoteItem = new vscode.TreeItem(
-      "Create New Note",
-      vscode.TreeItemCollapsibleState.None
-    );
-    createNoteItem.command = {
+class CreateNoteItem extends vscode.TreeItem {
+  constructor() {
+    super("Create New Note", vscode.TreeItemCollapsibleState.None);
+    this.command = {
       command: "branchNotes.createNote",
       title: "Create New Note",
     };
-    createNoteItem.iconPath = new vscode.ThemeIcon("edit");
+    this.iconPath = new vscode.ThemeIcon("edit");
+  }
+}
 
-    return [createNoteItem, ...noteItems];
+export class BranchNotesView implements vscode.TreeDataProvider<BranchTreeItem> {
+  private _onDidChangeTreeData: vscode.EventEmitter<BranchTreeItem | undefined | null | void> =
+    new vscode.EventEmitter<BranchTreeItem | undefined | null | void>();
+  readonly onDidChangeTreeData: vscode.Event<BranchTreeItem | undefined | null | void> =
+    this._onDidChangeTreeData.event;
+
+  constructor(private storageService: NoteStorageService) {}
+
+  refresh(): void {
+    this._onDidChangeTreeData.fire();
+  }
+
+  getTreeItem(element: BranchTreeItem): vscode.TreeItem {
+    return element;
+  }
+
+  async getChildren(element?: BranchTreeItem): Promise<BranchTreeItem[]> {
+    if (!element) {
+      // Root level: Create button + List of branches
+      const branches = await this.storageService.getBranches();
+      const branchItems = branches.map(b => new BranchItem(b));
+      return [new CreateNoteItem(), ...branchItems];
+    } else if (element instanceof BranchItem) {
+      // Branch level: List of notes
+      const notes = await this.storageService.getNotes(element.branchName);
+      return notes.map(note => new NoteItem(element.branchName, note));
+    }
+    return [];
   }
 }

@@ -19,6 +19,15 @@
         "command": "branchNotes.createNote",
         "title": "Create Branch Note",
         "icon": "$(edit)"
+      },
+      {
+        "command": "branchNotes.viewNote",
+        "title": "View Branch Note"
+      },
+      {
+        "command": "branchNotes.deleteNote",
+        "title": "Delete Branch Note",
+        "icon": "$(trash)"
       }
     ],
     "viewsContainers": {
@@ -50,6 +59,13 @@
         {
           "command": "branchNotes.createNote",
           "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "branchNotes.deleteNote",
+          "when": "view == branchNotesView && viewItem == branchNote",
+          "group": "inline"
         }
       ]
     },

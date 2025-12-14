@@ -36,11 +36,71 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // Register command to view a note
+  const viewNoteCommand = vscode.commands.registerCommand(
+    "branchNotes.viewNote",
+    async (branchName: string, note?: any) => {
+      if (!storageService) {
+        return;
+      }
+      
+      let noteToView = note;
+      if (!noteToView) {
+        // If no specific note passed, get the latest one
+        noteToView = await storageService.getLatestNote(branchName);
+      }
+
+      if (noteToView) {
+        showNoteInWebview(branchName, noteToView.content, noteToView.author, noteToView.timestamp);
+      }
+    }
+  );
+
+  // Register command to delete a note or branch
+  const deleteNoteCommand = vscode.commands.registerCommand(
+    "branchNotes.deleteNote",
+    async (item: any) => {
+      if (!storageService || !branchNotesView) {
+        return;
+      }
+
+      // Check if it's a branch item or note item
+      if (item.contextValue === "branchItem") {
+        // Delete entire branch history
+        const branchName = item.branchName;
+        const confirm = await vscode.window.showWarningMessage(
+          `Delete ALL notes for branch "${branchName}"?`,
+          "Delete All",
+          "Cancel"
+        );
+        if (confirm === "Delete All") {
+          await storageService.deleteBranch(branchName);
+          branchNotesView.refresh();
+          vscode.window.showInformationMessage(`All notes for branch "${branchName}" deleted.`);
+        }
+      } else if (item.contextValue === "noteItem") {
+        // Delete specific note
+        const branchName = item.branchName;
+        const noteId = item.note.id;
+        const confirm = await vscode.window.showWarningMessage(
+          `Delete this note?`,
+          "Delete",
+          "Cancel"
+        );
+        if (confirm === "Delete") {
+          await storageService.deleteNote(branchName, noteId);
+          branchNotesView.refresh();
+          vscode.window.showInformationMessage(`Note deleted.`);
+        }
+      }
+    }
+  );
+
   // Register sidebar panel
   const branchNotesView = new BranchNotesView(storageService);
   vscode.window.registerTreeDataProvider("branchNotesView", branchNotesView);
 
-  context.subscriptions.push(createNoteCommand);
+  context.subscriptions.push(createNoteCommand, viewNoteCommand, deleteNoteCommand);
 }
 
 export function deactivate() {}
@@ -234,7 +294,7 @@ async function openNoteEditor(context: vscode.ExtensionContext) {
   panel.webview.onDidReceiveMessage(async (msg) => {
     if (msg.type === "submit") {
       try {
-        await storageService!.saveNote(currentBranch, msg.content, msg.author);
+        await storageService!.addNote(currentBranch, msg.content, msg.author);
         vscode.window.showInformationMessage(
           `Note saved for branch: ${currentBranch}`
         );
@@ -246,6 +306,64 @@ async function openNoteEditor(context: vscode.ExtensionContext) {
       }
     }
   });
+}
+
+// Helper function to show note in webview
+function showNoteInWebview(branchName: string, content: string, author: string, timestamp?: string): void {
+  const panel = vscode.window.createWebviewPanel(
+    "branchNoteView",
+    `Branch Note: ${branchName}`,
+    vscode.ViewColumn.One,
+    { enableScripts: false }
+  );
+
+  const dateStr = timestamp ? new Date(timestamp).toLocaleString() : "";
+
+  panel.webview.html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Branch Note</title>
+      <style>
+        body {
+          font-family: var(--vscode-font-family);
+          padding: 20px;
+          color: var(--vscode-foreground);
+          background-color: var(--vscode-editor-background);
+        }
+        h1 {
+          color: var(--vscode-foreground);
+          border-bottom: 1px solid var(--vscode-panel-border);
+          padding-bottom: 10px;
+        }
+        .meta-info {
+          color: var(--vscode-descriptionForeground);
+          font-size: 13px;
+          margin-bottom: 20px;
+          padding: 10px;
+          background-color: var(--vscode-textBlockQuote-background);
+          border-left: 3px solid var(--vscode-textBlockQuote-border);
+        }
+        .note-content {
+          margin-top: 20px;
+          line-height: 1.6;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>📝 Branch Note: ${branchName}</h1>
+      <div class="meta-info">
+        <div>👤 Author: <strong>${author}</strong></div>
+        ${dateStr ? `<div>🕒 Date: ${dateStr}</div>` : ""}
+      </div>
+      <div class="note-content">
+        ${content}
+      </div>
+    </body>
+    </html>
+  `;
 }
 
 // function openNoteEditor() {
