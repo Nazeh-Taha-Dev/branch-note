@@ -201,7 +201,7 @@ async function openNoteEditor(context: vscode.ExtensionContext) {
           background: var(--vscode-button-hoverBackground);
         }
         #editor { 
-          width: 100%; 
+          width: 90%; 
           min-height: 300px; 
           border: 1px solid var(--vscode-input-border);
           padding: 10px;
