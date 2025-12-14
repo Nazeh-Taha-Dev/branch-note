@@ -40,7 +40,22 @@ export class BranchMonitor {
     }
 
     // Monitor the first repository
-    const repo = api.repositories[0];
+    if (api.repositories.length > 0) {
+      this.startMonitoring(api.repositories[0]);
+    } else {
+      // Wait for repository to be opened
+      const disposable = api.onDidOpenRepository((repo: any) => {
+        this.startMonitoring(repo);
+        disposable.dispose();
+      });
+      this.context.subscriptions.push(disposable);
+    }
+  }
+
+  /**
+   * Start monitoring a repository
+   */
+  private async startMonitoring(repo: any): Promise<void> {
     this.currentBranch = repo.state.HEAD?.name || null;
 
     // Listen for branch changes
@@ -78,7 +93,7 @@ export class BranchMonitor {
 
     // Check if user has already dismissed this note
     const dismissedNotes = this.getDismissedNotes();
-    const noteKey = this.getNoteKey(branchName);
+    const noteKey = this.getNoteKey(branchName, note.id);
 
     if (dismissedNotes.includes(noteKey)) {
       // User has dismissed this note before, don't show again
@@ -86,19 +101,17 @@ export class BranchMonitor {
     }
 
     // Show the note in a popup
-    this.showNotePopup(branchName, note.content, note.author);
+    this.showNotePopup(branchName, note.content, note.author, note.id);
   }
 
-  /**
-   * Show note popup to user
-   */
   /**
    * Show note popup to user
    */
   private async showNotePopup(
     branchName: string,
     content: string,
-    author: string
+    author: string,
+    noteId: string
   ): Promise<void> {
     // Strip HTML tags for the popup message (simple version)
     const plainText = content.replace(/<[^>]*>/g, "");
@@ -111,12 +124,12 @@ export class BranchMonitor {
 
     if (action === "Dismiss") {
       // Mark note as dismissed
-      this.markNoteDismissed(branchName);
+      this.markNoteDismissed(branchName, noteId);
     } else if (action === "View Full Note") {
       // Show full note using the command
       vscode.commands.executeCommand("branchNotes.viewNote", branchName);
       // Also mark as dismissed so it doesn't show again
-      this.markNoteDismissed(branchName);
+      this.markNoteDismissed(branchName, noteId);
     }
   }
 
@@ -128,10 +141,9 @@ export class BranchMonitor {
   /**
    * Get unique key for a note (branch name + content hash)
    */
-  private getNoteKey(branchName: string): string {
-    // For now, just use branch name as key
-    // In future, could add content hash to detect note updates
-    return branchName;
+  private getNoteKey(branchName: string, noteId: string): string {
+    // Use branch name AND note ID to ensure new notes on same branch are shown
+    return `${branchName}:${noteId}`;
   }
 
   /**
@@ -144,9 +156,9 @@ export class BranchMonitor {
   /**
    * Mark a note as dismissed
    */
-  private async markNoteDismissed(branchName: string): Promise<void> {
+  private async markNoteDismissed(branchName: string, noteId: string): Promise<void> {
     const dismissedNotes = this.getDismissedNotes();
-    const noteKey = this.getNoteKey(branchName);
+    const noteKey = this.getNoteKey(branchName, noteId);
 
     if (!dismissedNotes.includes(noteKey)) {
       dismissedNotes.push(noteKey);
@@ -159,8 +171,8 @@ export class BranchMonitor {
    */
   async clearDismissed(branchName: string): Promise<void> {
     const dismissedNotes = this.getDismissedNotes();
-    const noteKey = this.getNoteKey(branchName);
-    const filtered = dismissedNotes.filter((key) => key !== noteKey);
+    // Clear all dismissed notes for this branch
+    const filtered = dismissedNotes.filter((key) => !key.startsWith(`${branchName}:`));
     await this.context.workspaceState.update("dismissedNotes", filtered);
   }
 
