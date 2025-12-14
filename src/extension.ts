@@ -7,6 +7,7 @@ import { GitUserService } from "./GitUserService";
 let storageService: NoteStorageService | null = null;
 let branchMonitor: BranchMonitor | null = null;
 let gitUserService: GitUserService | null = null;
+let branchNotesView: BranchNotesView | null = null;
 
 export function activate(context: vscode.ExtensionContext) {
   // Get workspace root folder
@@ -43,7 +44,7 @@ export function activate(context: vscode.ExtensionContext) {
       if (!storageService) {
         return;
       }
-      
+
       let noteToView = note;
       if (!noteToView) {
         // If no specific note passed, get the latest one
@@ -51,7 +52,12 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       if (noteToView) {
-        showNoteInWebview(branchName, noteToView.content, noteToView.author, noteToView.timestamp);
+        showNoteInWebview(
+          branchName,
+          noteToView.content,
+          noteToView.author,
+          noteToView.timestamp
+        );
       }
     }
   );
@@ -76,7 +82,9 @@ export function activate(context: vscode.ExtensionContext) {
         if (confirm === "Delete All") {
           await storageService.deleteBranch(branchName);
           branchNotesView.refresh();
-          vscode.window.showInformationMessage(`All notes for branch "${branchName}" deleted.`);
+          vscode.window.showInformationMessage(
+            `All notes for branch "${branchName}" deleted.`
+          );
         }
       } else if (item.contextValue === "noteItem") {
         // Delete specific note
@@ -97,10 +105,14 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   // Register sidebar panel
-  const branchNotesView = new BranchNotesView(storageService);
+  branchNotesView = new BranchNotesView(storageService);
   vscode.window.registerTreeDataProvider("branchNotesView", branchNotesView);
 
-  context.subscriptions.push(createNoteCommand, viewNoteCommand, deleteNoteCommand);
+  context.subscriptions.push(
+    createNoteCommand,
+    viewNoteCommand,
+    deleteNoteCommand
+  );
 }
 
 export function deactivate() {}
@@ -299,17 +311,23 @@ async function openNoteEditor(context: vscode.ExtensionContext) {
           `Note saved for branch: ${currentBranch}`
         );
         panel.dispose();
+
+        // Refresh the tree view to show the new note instantly
+        branchNotesView!.refresh();
       } catch (error) {
-        vscode.window.showErrorMessage(
-          `Failed to save note: ${error}`
-        );
+        vscode.window.showErrorMessage(`Failed to save note: ${error}`);
       }
     }
   });
 }
 
 // Helper function to show note in webview
-function showNoteInWebview(branchName: string, content: string, author: string, timestamp?: string): void {
+function showNoteInWebview(
+  branchName: string,
+  content: string,
+  author: string,
+  timestamp?: string
+): void {
   const panel = vscode.window.createWebviewPanel(
     "branchNoteView",
     `Branch Note: ${branchName}`,

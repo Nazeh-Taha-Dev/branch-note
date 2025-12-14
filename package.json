@@ -2,7 +2,7 @@
   "name": "branch-note",
   "displayName": "Branch Note",
   "description": "Shows notifications for branch-specific notes.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.106.0"
   },
