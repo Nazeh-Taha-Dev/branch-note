@@ -394,20 +394,3 @@ function showNoteInWebview(
   `;
 }
 
-// function openNoteEditor() {
-//   const panel = vscode.window.createWebviewPanel(
-//     "branchNoteEditor",
-//     "Create Note",
-//     vscode.ViewColumn.One,
-//     { enableScripts: true }
-//   );
-
-//   panel.webview.html = `
-//     <html>
-//       <body>
-//         <h2>Create Branch Note</h2>
-//         <textarea style="width:100%; height:80vh;">Write your note here...</textarea>
-//       </body>
-//     </html>
-//   `;
-// }

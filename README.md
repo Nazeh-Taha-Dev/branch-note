@@ -31,12 +31,10 @@ When you return to a branch days or weeks later, your notes appear instantly—s
 ### Create and View Branch Notes
 Create a note for the current branch and automatically see it again when you switch back.
 
-![Create and view branch notes](./assets/branch-note-demo.gif)
-
 ### Team Collaboration Across Branches
 Notes committed to the repository are shared and visible to every team member who checks out the branch.
 
-![Team branch notes](./assets/branch-note-demo.gif)
+![Create and view branch notes](./assets/branch-note-demo.gif)
 
 ---
 
