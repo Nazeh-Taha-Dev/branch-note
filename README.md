@@ -2,6 +2,15 @@
 
 **Branch Note** is a powerful VS Code extension designed to help developers keep track of branch-specific notes and to-dos. Never lose context when switching branches again!
 
+## Why Branch Note?
+
+### 1. Seamless Team Collaboration
+Share knowledge effortlessy with your team. By leaving notes on a branch, any team member checking out that branch will see the relevant context, instructions, or pending tasks.
+> **Note:** To enable team sharing, make sure to commit the `.branch-notes.json` file to your repository.
+
+### 2. Personal Context Manager
+Frequently switching between multiple feature branches? **Branch Note** acts as your personal memory bank. Leave notes for yourself on each branch to instantly remind yourself of your progress, next steps, or tricky implementation details when you return to that branch.
+
 ## Features
 
 - **Branch-Specific Notes**: Automatically associates notes with the Git branch you are currently working on.
