@@ -1,8 +1,13 @@
 {
   "name": "branch-note",
+  "publisher": "nazeh-taha",
+  "author": {
+    "name": "Nazeh Taha",
+    "url": "https://www.nazeh-taha.com/"
+  },
   "displayName": "Branch Note",
   "icon": "images/icon.png",
-  "description": "Shows notifications for branch-specific notes.",
+  "description": "Automatically shows notifications for notes associated with the currently active Git branch",
   "version": "0.0.6",
   "engines": {
     "vscode": "^1.106.0"

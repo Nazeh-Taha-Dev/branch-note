@@ -1,71 +1,38 @@
-# branch-note README
+# Branch Note
 
-This is the README file for your extension "branch-note". After writing up a brief description, we recommend including the following sections.
+**Branch Note** is a powerful VS Code extension designed to help developers keep track of branch-specific notes and to-dos. Never lose context when switching branches again!
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- **Branch-Specific Notes**: Automatically associates notes with the Git branch you are currently working on.
+- **Contextual Notifications**: Get notified of your notes when you switch back to a branch.
+- **Easy Management**: Create, view, and delete notes directly from the VS Code interface.
+- **Rich Text Support**: (Coming soon) Support for enhanced note formatting.
 
-For example if there is an image subfolder under your extension project workspace:
+## Usage
 
-\!\[feature X\]\(images/feature-x.png\)
+1.  **Create a Note**:
+    *   Open the Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`) and type `Branch Note: Create Note`.
+    *   Or use the keybinding: `Cmd+Shift+N` (Mac) / `Ctrl+Shift+N` (Win/Linux).
+    *   Or click the "Edit" icon in the Branch Notes view.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+2.  **View Notes**:
+    *   Notes for your current branch are displayed in the **Branch Notes** view in the Activity Bar.
 
-## Requirements
+3.  **Delete a Note**:
+    *   Click the "Trash" icon next to a note in the Branch Notes view to remove it.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## About
 
-## Extension Settings
+This extension was created to solve the common problem of context switching between Git branches. By attaching notes to branches, you can instantly recall where you left off.
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+## Author
 
-For example:
+**Nazeh Taha**
 
-This extension contributes the following settings:
-
-- `myExtension.enable`: Enable/disable this extension.
-- `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+*   **LinkedIn**: [https://www.linkedin.com/in/nazeh-taha/](https://www.linkedin.com/in/nazeh-taha/)
+*   **Website**: [https://www.nazeh-taha.com/](https://www.nazeh-taha.com/)
 
 ---
 
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-- [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-- Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-- Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-- Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-- [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-- [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+**Enjoy coding with context!**
