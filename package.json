@@ -5,9 +5,13 @@
     "name": "Nazeh Taha",
     "url": "https://www.nazeh-taha.com/"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Nazeh-Taha-Dev/branch-note.git"
+  },
   "displayName": "Branch Note",
   "icon": "images/icon.png",
-  "description": "Automatically shows notifications for notes associated with the currently active Git branch",
+  "description": "Shows notes specific to each Git branch",
   "version": "0.0.6",
   "engines": {
     "vscode": "^1.106.0"
@@ -16,7 +20,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:branch-note.helloWorld"
+    "onStartupFinished"
   ],
   "main": "./dist/extension.js",
   "contributes": {

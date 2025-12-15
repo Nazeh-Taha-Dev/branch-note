@@ -201,7 +201,8 @@ async function openNoteEditor(context: vscode.ExtensionContext) {
           background: var(--vscode-button-hoverBackground);
         }
         #editor { 
-          width: 90%; 
+          width: 100%; 
+          box-sizing: border-box;
           min-height: 300px; 
           border: 1px solid var(--vscode-input-border);
           padding: 10px;
@@ -247,6 +248,9 @@ async function openNoteEditor(context: vscode.ExtensionContext) {
         <button onclick="formatText('bold')" title="Bold (Ctrl+B)">
           <strong>B</strong>
         </button>
+        <button onclick="formatHeader('H1')" title="Heading 1"><b>H1</b></button>
+        <button onclick="formatHeader('H2')" title="Heading 2"><b>H2</b></button>
+        <button onclick="formatHeader('H3')" title="Heading 3"><b>H3</b></button>
         <button onclick="insertList('ul')" title="Bullet List">
           • List
         </button>
@@ -268,6 +272,12 @@ async function openNoteEditor(context: vscode.ExtensionContext) {
         // Format selected text
         function formatText(command) {
           document.execCommand(command, false, null);
+          editor.focus();
+        }
+
+        // Format Headers
+        function formatHeader(tag) {
+          document.execCommand('formatBlock', false, tag);
           editor.focus();
         }
 

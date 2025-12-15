@@ -1,47 +1,94 @@
 # Branch Note
 
-**Branch Note** is a powerful VS Code extension designed to help developers keep track of branch-specific notes and to-dos. Never lose context when switching branches again!
+**Branch Note** is a VS Code extension that helps developers stay organized and productive by attaching notes directly to Git branches. It ensures that important context, reminders, and team knowledge are never lost when switching branches.
 
 ## Why Branch Note?
 
-### 1. Seamless Team Collaboration
-Share knowledge effortlessy with your team. By leaving notes on a branch, any team member checking out that branch will see the relevant context, instructions, or pending tasks.
-> **Note:** To enable team sharing, make sure to commit the `.branch-notes.json` file to your repository.
+### 1. Shared Branch Context for Teams 🤝
+Improve team collaboration by sharing notes directly on a Git branch. When a team member checks out a branch, they instantly see the notes left for that branch—such as implementation details, TODOs, warnings, or handover instructions.
 
-### 2. Personal Context Manager
-Frequently switching between multiple feature branches? **Branch Note** acts as your personal memory bank. Leave notes for yourself on each branch to instantly remind yourself of your progress, next steps, or tricky implementation details when you return to that branch.
+This is especially useful for:
+- Code reviews
+- Handoffs between developers
+- Explaining temporary decisions or work-in-progress states
+
+> **Note:** To enable team-wide sharing, commit the `.branch-notes.json` file to your repository so all team members can access the notes.
+
+---
+
+### 2. Personal Memory When Switching Branches 🧠
+If you frequently jump between branches, **Branch Note** acts as your personal reminder system. You can leave notes specific to each branch to capture:
+- What you were working on
+- What still needs to be done
+- Important decisions or tricky logic
+
+When you return to a branch days or weeks later, your notes appear instantly—saving time and mental effort.
+
+---
+
+## Demo
+
+### Create and View Branch Notes
+Create a note for the current branch and automatically see it again when you switch back.
+
+![Create and view branch notes](./assets/branch-note-demo.gif)
+
+### Team Collaboration Across Branches
+Notes committed to the repository are shared and visible to every team member who checks out the branch.
+
+![Team branch notes](./assets/branch-note-team.gif)
+
+---
 
 ## Features
 
-- **Branch-Specific Notes**: Automatically associates notes with the Git branch you are currently working on.
-- **Contextual Notifications**: Get notified of your notes when you switch back to a branch.
-- **Easy Management**: Create, view, and delete notes directly from the VS Code interface.
-- **Rich Text Support**: (Coming soon) Support for enhanced note formatting.
+- **Branch-Specific Notes**  
+  Notes are automatically linked to the currently active Git branch.
+
+- **Contextual Notifications**  
+  Get notified of existing notes when you switch to a branch.
+
+- **Team-Friendly by Design**  
+  Share notes across the team by committing the notes file to the repository.
+
+- **Easy Note Management**  
+  Create, view, and delete notes directly from the VS Code interface.
+
+- **Rich Text Support**  
+  _(Coming soon)_ Enhanced formatting for clearer and more expressive notes.
+
+---
 
 ## Usage
 
-1.  **Create a Note**:
-    *   Open the Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`) and type `Branch Note: Create Note`.
-    *   Or use the keybinding: `Cmd+Shift+N` (Mac) / `Ctrl+Shift+N` (Win/Linux).
-    *   Or click the "Edit" icon in the Branch Notes view.
+### Create a Note
+- Open the Command Palette  
+  `Cmd + Shift + P` / `Ctrl + Shift + P` → **Branch Note: Create Note**
+- Or use the shortcut  
+  `Cmd + Shift + N` (Mac) / `Ctrl + Shift + N` (Windows / Linux)
+- Or click the **Edit** icon in the Branch Notes view
 
-2.  **View Notes**:
-    *   Notes for your current branch are displayed in the **Branch Notes** view in the Activity Bar.
+### View Notes
+- Notes for the current branch appear in the **Branch Notes** view in the Activity Bar.
 
-3.  **Delete a Note**:
-    *   Click the "Trash" icon next to a note in the Branch Notes view to remove it.
+### Delete a Note
+- Click the **Trash** icon next to the note in the Branch Notes view.
+
+---
 
 ## About
 
-This extension was created to solve the common problem of context switching between Git branches. By attaching notes to branches, you can instantly recall where you left off.
+**Branch Note** was created to solve a common developer pain point: losing context when switching Git branches. By keeping notes tied to branches, both individuals and teams can work more efficiently and confidently.
+
+---
 
 ## Author
 
 **Nazeh Taha**
 
-*   **LinkedIn**: [https://www.linkedin.com/in/nazeh-taha/](https://www.linkedin.com/in/nazeh-taha/)
-*   **Website**: [https://www.nazeh-taha.com/](https://www.nazeh-taha.com/)
+- **LinkedIn**: https://www.linkedin.com/in/nazeh-taha/
+- **Website**: https://www.nazeh-taha.com/
 
 ---
 
-**Enjoy coding with context!**
+**Code with context. Never lose your place again. 🚀**
