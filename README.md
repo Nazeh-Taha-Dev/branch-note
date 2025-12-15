@@ -36,7 +36,7 @@ Create a note for the current branch and automatically see it again when you swi
 ### Team Collaboration Across Branches
 Notes committed to the repository are shared and visible to every team member who checks out the branch.
 
-![Team branch notes](./assets/branch-note-team.gif)
+![Team branch notes](./assets/branch-note-demo.gif)
 
 ---
 
