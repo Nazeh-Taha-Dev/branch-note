@@ -12,12 +12,20 @@
   "displayName": "Branch Note",
   "icon": "images/icon.png",
   "description": "Shows notes specific to each Git branch",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "engines": {
     "vscode": "^1.104.0"
   },
   "categories": [
     "Other"
+  ],
+  "keywords": [
+    "git",
+    "branch",
+    "notes",
+    "productivity",
+    "workflow",
+    "context"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -91,7 +99,7 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./dist/test/runTest.js"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
