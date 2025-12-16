@@ -32,7 +32,7 @@ export class NoteStorageService {
       const content = fs.readFileSync(this.storageFile, "utf-8");
       return JSON.parse(content);
     } catch (error) {
-      console.error("Error reading branch notes file:", error);
+      console.error("Error reading BranchPad notes file:", error);
       return {};
     }
   }

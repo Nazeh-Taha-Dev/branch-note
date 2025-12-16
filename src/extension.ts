@@ -14,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
   if (!workspaceFolder) {
     vscode.window.showWarningMessage(
-      "Branch Notes: No workspace folder found. Please open a folder to use this extension."
+      "BranchPad: No workspace folder found. Please open a folder to use this extension."
     );
     return;
   }
@@ -121,7 +121,7 @@ export function deactivate() {}
 async function openNoteEditor(context: vscode.ExtensionContext) {
   if (!branchMonitor || !storageService || !gitUserService) {
     vscode.window.showErrorMessage(
-      "Branch Notes: Service not initialized properly."
+      "BranchPad: Service not initialized properly."
     );
     return;
   }
@@ -129,7 +129,7 @@ async function openNoteEditor(context: vscode.ExtensionContext) {
   const currentBranch = branchMonitor.getCurrentBranch();
   if (!currentBranch) {
     vscode.window.showWarningMessage(
-      "Branch Notes: Unable to detect current branch. Make sure you're in a Git repository."
+      "BranchPad: Unable to detect current branch. Make sure you're in a Git repository."
     );
     return;
   }
@@ -139,7 +139,7 @@ async function openNoteEditor(context: vscode.ExtensionContext) {
 
   const panel = vscode.window.createWebviewPanel(
     "branchNoteEditor",
-    `Create Branch Note: ${currentBranch}`,
+    `Create BranchPad Note: ${currentBranch}`,
     vscode.ViewColumn.One,
     { enableScripts: true }
   );
@@ -150,7 +150,7 @@ async function openNoteEditor(context: vscode.ExtensionContext) {
     <html lang="en">
     <head>
       <meta charset="UTF-8">
-      <title>Create Branch Note</title>
+      <title>Create BranchPad Note</title>
       <style>
         body { 
           font-family: var(--vscode-font-family);
@@ -236,7 +236,7 @@ async function openNoteEditor(context: vscode.ExtensionContext) {
     <body>
       <div class="header">
         <div>
-          <h2>Create Branch Note</h2>
+          <h2>Create BranchPad Note</h2>
           <div class="branch-info">📝 Branch: <strong>${currentBranch}</strong></div>
         </div>
         <div class="author-info">
@@ -340,7 +340,7 @@ function showNoteInWebview(
 ): void {
   const panel = vscode.window.createWebviewPanel(
     "branchNoteView",
-    `Branch Note: ${branchName}`,
+    `BranchPad Note: ${branchName}`,
     vscode.ViewColumn.One,
     { enableScripts: false }
   );
@@ -353,7 +353,7 @@ function showNoteInWebview(
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Branch Note</title>
+      <title>BranchPad Note</title>
       <style>
         body {
           font-family: var(--vscode-font-family);
@@ -381,7 +381,7 @@ function showNoteInWebview(
       </style>
     </head>
     <body>
-      <h1>📝 Branch Note: ${branchName}</h1>
+      <h1>📝 BranchPad Note: ${branchName}</h1>
       <div class="meta-info">
         <div>👤 Author: <strong>${author}</strong></div>
         ${dateStr ? `<div>🕒 Date: ${dateStr}</div>` : ""}

@@ -1,8 +1,8 @@
-# Branch Note
+# BranchPad
 
-**Branch Note** is a VS Code extension that helps developers stay organized and productive by attaching notes directly to Git branches. It ensures that important context, reminders, and team knowledge are never lost when switching branches.
+**BranchPad** is a VS Code extension that helps developers stay organized and productive by attaching notes directly to Git branches. It ensures that important context, reminders, and team knowledge are never lost when switching branches.
 
-## Why Branch Note?
+## Why BranchPad?
 
 ### 1. Shared Branch Context for Teams 🤝
 Improve team collaboration by sharing notes directly on a Git branch. When a team member checks out a branch, they instantly see the notes left for that branch—such as implementation details, TODOs, warnings, or handover instructions.
@@ -17,7 +17,7 @@ This is especially useful for:
 ---
 
 ### 2. Personal Memory When Switching Branches 🧠
-If you frequently jump between branches, **Branch Note** acts as your personal reminder system. You can leave notes specific to each branch to capture:
+If you frequently jump between branches, **BranchPad** acts as your personal reminder system. You can leave notes specific to each branch to capture:
 - What you were working on
 - What still needs to be done
 - Important decisions or tricky logic
@@ -28,13 +28,13 @@ When you return to a branch days or weeks later, your notes appear instantly—s
 
 ## Demo
 
-### Create and View Branch Notes
+### Create and View BranchPad Notes
 Create a note for the current branch and automatically see it again when you switch back.
 
 ### Team Collaboration Across Branches
 Notes committed to the repository are shared and visible to every team member who checks out the branch.
 
-![Create and view branch notes](./assets/branch-note-demo.gif)
+![Create and view BranchPad notes](./assets/branch-note-demo.gif)
 
 ---
 
@@ -61,22 +61,22 @@ Notes committed to the repository are shared and visible to every team member wh
 
 ### Create a Note
 - Open the Command Palette  
-  `Cmd + Shift + P` / `Ctrl + Shift + P` → **Branch Note: Create Note**
+  `Cmd + Shift + P` / `Ctrl + Shift + P` → **BranchPad: Create Note**
 - Or use the shortcut  
   `Cmd + Shift + N` (Mac) / `Ctrl + Shift + N` (Windows / Linux)
-- Or click the **Edit** icon in the Branch Notes view
+- Or click the **Edit** icon in the BranchPad view
 
 ### View Notes
-- Notes for the current branch appear in the **Branch Notes** view in the Activity Bar.
+- Notes for the current branch appear in the **BranchPad** view in the Activity Bar.
 
 ### Delete a Note
-- Click the **Trash** icon next to the note in the Branch Notes view.
+- Click the **Trash** icon next to the note in the BranchPad view.
 
 ---
 
 ## About
 
-**Branch Note** was created to solve a common developer pain point: losing context when switching Git branches. By keeping notes tied to branches, both individuals and teams can work more efficiently and confidently.
+**BranchPad** was created to solve a common developer pain point: losing context when switching Git branches. By keeping notes tied to branches, both individuals and teams can work more efficiently and confidently.
 
 ---
 

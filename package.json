@@ -1,5 +1,5 @@
 {
-  "name": "branch-note",
+  "name": "branch-pad",
   "publisher": "nazeh-taha",
   "author": {
     "name": "Nazeh Taha",
@@ -9,7 +9,7 @@
     "type": "git",
     "url": "https://github.com/Nazeh-Taha-Dev/branch-note.git"
   },
-  "displayName": "Branch Note",
+  "displayName": "BranchPad",
   "icon": "images/icon.png",
   "description": "Shows notes specific to each Git branch",
   "version": "0.0.8",
@@ -35,16 +35,16 @@
     "commands": [
       {
         "command": "branchNotes.createNote",
-        "title": "Create Branch Note",
+        "title": "Create BranchPad Note",
         "icon": "$(edit)"
       },
       {
         "command": "branchNotes.viewNote",
-        "title": "View Branch Note"
+        "title": "View BranchPad Note"
       },
       {
         "command": "branchNotes.deleteNote",
-        "title": "Delete Branch Note",
+        "title": "Delete BranchPad Note",
         "icon": "$(trash)"
       }
     ],
@@ -52,7 +52,7 @@
       "activitybar": [
         {
           "id": "branchNotesContainer",
-          "title": "Branch Notes",
+          "title": "BranchPad",
           "icon": "$(note)"
         }
       ]
@@ -61,7 +61,7 @@
       "branchNotesContainer": [
         {
           "id": "branchNotesView",
-          "name": "Branch Notes"
+          "name": "BranchPad"
         }
       ]
     },

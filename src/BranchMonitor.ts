@@ -117,7 +117,7 @@ export class BranchMonitor {
     const plainText = content.replace(/<[^>]*>/g, "");
 
     const action = await vscode.window.showInformationMessage(
-      `📝 Branch Note from ${author} (${branchName}): ${plainText}`,
+      `📝 BranchPad Note from ${author} (${branchName}): ${plainText}`,
       "Dismiss",
       "View Full Note"
     );
